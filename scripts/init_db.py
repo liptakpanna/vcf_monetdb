@@ -18,8 +18,8 @@ def create_db(db):
     #return "SELECT 'CREATE DATABASE \"{0}\"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{0}')".format(db)
     return "CREATE DATABASE \"{0}\"".format(db)
 
-def create_user(user, pw):
-    return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}'".format(user, pw)
+def create_user(user, pw, full_name, schema = 'sys'):
+    return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}' name '{2}' schema \"{3}\"".format(user, pw, full_name, schema)
 
 def grant_read(user, db):
     return [ "GRANT CONNECT ON DATABASE \"{1}\" TO \"{0}\"".format(user, db), "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{0}\"".format(user) ]
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     # create user
     if args.create_user:
-        statement = create_user(os.getenv('READONLY_USERNAME', 'kooplex-reader'), os.getenv('READONLY_PASSWORD', 'reader-pw'))
+        statement = create_user(os.getenv('READONLY_USERNAME', 'kooplex-reader'), os.getenv('READONLY_PASSWORD', 'reader-pw'), os.getenv('READONLY_FULLNAME', 'Kooplex Reader') )
         db_exec( statement, transaction = False )
 
     # grant read only right to user
