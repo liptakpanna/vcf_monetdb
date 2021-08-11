@@ -19,7 +19,7 @@ def create_db(db):
     return "CREATE DATABASE \"{0}\"".format(db)
 
 def create_user(user, pw):
-    return "CREATE USER \"{0}\" PASSWORD '{1}'".format(user, pw)
+    return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}'".format(user, pw)
 
 def grant_read(user, db):
     return [ "GRANT CONNECT ON DATABASE \"{1}\" TO \"{0}\"".format(user, db), "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{0}\"".format(user) ]
