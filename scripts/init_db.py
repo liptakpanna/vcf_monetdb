@@ -86,7 +86,7 @@ if __name__ == '__main__':
                      help = "create a table")
     parser.add_argument("-p", "--create_tables_append", action = "store_true",
                      help = "create a copy table of vcf and cov to append new data")
-    parser.add_argument("-D", "--drop_table", choices = tables,
+    parser.add_argument("-D", "--drop_table", choices = tc,
                      help = "drop a table")
     parser.add_argument("-B", "--backup_table", choices = tables,
                      help = "backup a table")
