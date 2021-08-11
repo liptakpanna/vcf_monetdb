@@ -8,21 +8,32 @@ import argparse
 host = os.getenv('DB_HOST','monetdb.monetdb')
 port = os.getenv('DB_PORT', 50000)
 db = os.getenv('DB', 'demo')
+schema = os.getenv('SCHEMA', 'kooplex')
 
 p = os.getenv('SCHEMA_PATH', '../schema')
 
 tables = [ 'cov', 'vcf_all', 'vcf', 'meta', 'lineage_def', 'ecdc_covid_country_weekly', 'operation', 'unique_cov', 'unique_vcf' ]
-mviews = [ 'unique_ena_run_summary', 'lineage0', 'lineage_base', 'lineage_other', 'lineage_not_analyzed', 'lineage' ]
+views = [ 'unique_ena_run_summary', 'lineage0', 'lineage_base', 'lineage_other', 'lineage_not_analyzed', 'lineage' ]
 
 def create_db(db):
     #return "SELECT 'CREATE DATABASE \"{0}\"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{0}')".format(db)
     return "CREATE DATABASE \"{0}\"".format(db)
 
-def create_user(user, pw, full_name, schema = 'sys'):
+def create_user(user, pw, full_name, schema = schema):
     return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}' name '{2}' schema \"{3}\"".format(user, pw, full_name, schema)
 
 def grant_read(user, db):
-    return [ "GRANT CONNECT ON DATABASE \"{1}\" TO \"{0}\"".format(user, db), "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{0}\"".format(user) ]
+    grants = []
+
+    for table in tables:
+        table = schema + "." + table
+        grants.append("GRANT SELECT ON TABLE {1} TO {0}".format(user, table) )
+
+    for view in views:
+        view = schema + "." + view
+        grants.append("GRANT SELECT ON TABLE {1} TO {0}".format(user, view) )
+
+    return grants
 
 def db_exec(statement, transaction = True):
     try:
@@ -76,7 +87,7 @@ if __name__ == '__main__':
                     help = "filter vcf_all_append (recent consensus af>.1)")
     parser.add_argument("-r", "--rename_tables", action = "store_true",
                     help = "rename *_append tables")
-    parser.add_argument("-m", "--create_materialized_views", action = "store_true",
+    parser.add_argument("-m", "--create_views", action = "store_true",
                     help = "create materialized_views")
     parser.add_argument("-A", "--operate_on_append", action = "store_true",
                     help = "operate on *_append")
@@ -103,6 +114,9 @@ if __name__ == '__main__':
     myConnection = con(db)
     print ("{0} connected to db {1}".format(datetime.datetime.now(), db))
 
+    db_exec("Create schema if not exists kooplex")
+    db_exec("set schema kooplex")
+
     # create user
     if args.create_user:
         statement = create_user(os.getenv('READONLY_USERNAME', 'kooplex-reader'), os.getenv('READONLY_PASSWORD', 'reader-pw'), os.getenv('READONLY_FULLNAME', 'Kooplex Reader') )
@@ -125,7 +139,11 @@ if __name__ == '__main__':
 
     # drop tables
     if args.drop_table:
-        db_exec( "DROP TABLE IF EXISTS {} CASCADE".format(args.drop_table), transaction = True )
+        if args.drop_table == 'all':
+            for table in tables:
+                db_exec( "DROP TABLE IF EXISTS {} CASCADE".format(table), transaction = True )
+        else:
+            db_exec( "DROP TABLE IF EXISTS {} CASCADE".format(args.drop_table), transaction = True )
 
     # copy production tables for appending new data
     if args.create_tables_append:
@@ -151,8 +169,8 @@ if __name__ == '__main__':
         db_exec( "CREATE TABLE vcf_append AS SELECT * FROM vcf_all_append WHERE \"af\" >= {}".format(args.filter_vcf), transaction = True )
 
     # create materialized views
-    if args.create_materialized_views:
-        for v in mviews:
+    if args.create_views:
+        for v in views:
             statement = open(os.path.join(p, "mview-{}.t.sql".format(v))).read()
             if args.operate_on_append:
                 statement = re.sub('%%POSTFIX%%', '_append', statement )
@@ -179,7 +197,7 @@ if __name__ == '__main__':
         db_exec( "ALTER INDEX IF EXISTS idx_cov_pos_coverage_ RENAME TO idx_cov_pos_coverage", transaction = True )
         db_exec( "ALTER INDEX IF EXISTS idx_vcf_pos_ RENAME TO idx_vcf_pos", transaction = True )
         db_exec( "ALTER INDEX IF EXISTS idx_vcf_ena_run_ RENAME TO idx_vcf_ena_run", transaction = True )
-        for mv in mviews:
+        for mv in views:
             db_exec( f"ALTER VIEW IF EXISTS {mv}_append RENAME TO {mv}", transaction = True )
 
 
