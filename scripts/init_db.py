@@ -81,7 +81,7 @@ if __name__ == '__main__':
     parser.add_argument("-A", "--operate_on_append", action = "store_true",
                     help = "operate on *_append")
     args = parser.parse_args()
-
+    '''
     # drop databases
     if args.drop_db:
         myConnection = con(None)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         db_exec( create_db(db), transaction = False )
         myConnection.close()
         print ("{} disconnected from db engine".format(datetime.datetime.now()))
-
+    '''
     myConnection = con(db)
     print ("{0} connected to db {1}".format(datetime.datetime.now(), db))
 
