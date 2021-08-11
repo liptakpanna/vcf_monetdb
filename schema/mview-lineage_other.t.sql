@@ -1,4 +1,4 @@
-CREATE VIEW IF NOT EXISTS lineage_other%%POSTFIX%% AS
+CREATE OR REPLACE VIEW lineage_other%%POSTFIX%% AS
 SELECT "ena_run", "variant_id", "n", 0.0 AS "required_mutation"
 FROM (SELECT "ena_run", "variant_id", 0.0 AS "n"
 FROM (SELECT "ena_run", TEXT('Other variant') AS "variant_id"

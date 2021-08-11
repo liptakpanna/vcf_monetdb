@@ -1,4 +1,4 @@
-CREATE VIEW IF NOT EXISTS lineage0%%POSTFIX%% AS
+CREATE OR REPLACE VIEW lineage0%%POSTFIX%% AS
 SELECT *
 FROM (SELECT "LHS"."ena_run" AS "ena_run", "LHS"."variant_id" AS "variant_id", "LHS"."n" AS "n", "RHS"."required_mutation" AS "required_mutation"
 FROM (SELECT "ena_run", "variant_id", COUNT(*) AS "n"

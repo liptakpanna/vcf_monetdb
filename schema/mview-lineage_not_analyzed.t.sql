@@ -1,4 +1,4 @@
-CREATE VIEW IF NOT EXISTS lineage_not_analyzed%%POSTFIX%% AS
+CREATE OR REPLACE VIEW lineage_not_analyzed%%POSTFIX%% AS
 SELECT "ena_run", "variant_id", "n", 0.0 AS "required_mutation"
 FROM (SELECT "ena_run", "variant_id", 0 AS "n"
 FROM (SELECT "ena_run", TEXT('Not analysed yet ') AS "variant_id"

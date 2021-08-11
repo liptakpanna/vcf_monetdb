@@ -95,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument("-r", "--rename_tables", action = "store_true",
                     help = "rename *_append tables")
     parser.add_argument("-m", "--create_views", action = "store_true",
-                    help = "create materialized_views")
+                    help = "create views")
     parser.add_argument("-A", "--operate_on_append", action = "store_true",
                     help = "operate on *_append")
     args = parser.parse_args()
