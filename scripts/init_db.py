@@ -25,7 +25,7 @@ def create_db(db):
     return "CREATE DATABASE \"{0}\"".format(db)
 
 def create_user(user, pw, full_name, schema = schema):
-    return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}' name '{2}' schema \"{3}\"".format(user, pw, full_name, schema)
+    return "CREATE USER \"{0}\" WITH UNENCRYPTED PASSWORD '{1}' NAME '{2}' SCHEMA \"{3}\"".format(user, pw, full_name, schema)
 
 def grant_read(user, db):
     grants = []
