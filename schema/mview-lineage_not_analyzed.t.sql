@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW lineage_not_analyzed%%POSTFIX%% AS
 SELECT "ena_run", "variant_id", "n", 0.0 AS "required_mutation"
 FROM (SELECT "ena_run", "variant_id", 0 AS "n"
-FROM (SELECT "ena_run", TEXT('Not analysed yet ') AS "variant_id"
+FROM (SELECT "ena_run", 'Not analysed yet' AS "variant_id"
 FROM (SELECT * FROM (SELECT "ena_run"
 FROM "meta%%POSTFIX%%") "LHS"
 WHERE NOT EXISTS (
