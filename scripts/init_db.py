@@ -73,6 +73,8 @@ if __name__ == '__main__':
     #                help = "create database")
     parser.add_argument("-u", "--create_user", action = "store_true",
                     help = "create a database user")
+    parser.add_argument("-d", "--drop_user", action = "store_true",
+                    help = "drop the database user")
     parser.add_argument("-a", "--grant_access", action = "store_true",
                     help="grant read only right to database user")
     parser.add_argument("-t", "--create_table", choices = tc,
@@ -120,6 +122,11 @@ if __name__ == '__main__':
     # create user
     if args.create_user:
         statement = create_user(os.getenv('READONLY_USERNAME', 'kooplex-reader'), os.getenv('READONLY_PASSWORD', 'reader-pw'), os.getenv('READONLY_FULLNAME', 'Kooplex Reader') )
+        db_exec( statement, transaction = False )
+
+    # drop user
+    if args.drop_user:
+        statement = "DROP USER " + os.getenv('READONLY_USERNAME', 'kooplex-reader')
         db_exec( statement, transaction = False )
 
     # grant read only right to user
