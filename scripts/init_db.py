@@ -121,8 +121,8 @@ if __name__ == '__main__':
     myConnection = con(db)
     print ("{0} connected to db {1}".format(datetime.datetime.now(), db))
 
-    db_exec("Create schema if not exists kooplex")
-    db_exec("set schema kooplex")
+    db_exec("Create schema if not exists kooplex", transaction=False)
+    db_exec("set schema kooplex", transaction=False)
 
     # create user
     if args.create_user:
@@ -204,11 +204,7 @@ if __name__ == '__main__':
         db_exec( "ALTER TABLE IF EXISTS vcf_append RENAME TO vcf", transaction = True )
         db_exec( "ALTER TABLE IF EXISTS cov_append RENAME TO cov", transaction = True )
         db_exec( "ALTER TABLE IF EXISTS meta_append RENAME TO meta", transaction = True )
-        db_exec( "ALTER INDEX IF EXISTS idx_vcf_af_ RENAME TO idx_vcf_af", transaction = True )
-        db_exec( "ALTER INDEX IF EXISTS idx_vcf_hgvs_p_ RENAME TO idx_vcf_hgvs_p", transaction = True )
-        db_exec( "ALTER INDEX IF EXISTS idx_cov_pos_coverage_ RENAME TO idx_cov_pos_coverage", transaction = True )
-        db_exec( "ALTER INDEX IF EXISTS idx_vcf_pos_ RENAME TO idx_vcf_pos", transaction = True )
-        db_exec( "ALTER INDEX IF EXISTS idx_vcf_ena_run_ RENAME TO idx_vcf_ena_run", transaction = True )
+        
         for mv in views:
             db_exec( f"ALTER VIEW IF EXISTS {mv}_append RENAME TO {mv}", transaction = True )
 
