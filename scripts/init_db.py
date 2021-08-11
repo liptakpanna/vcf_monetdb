@@ -10,6 +10,11 @@ port = os.getenv('DB_PORT', 50000)
 db = os.getenv('DB', 'demo')
 schema = os.getenv('SCHEMA', 'kooplex')
 
+# Dont use username with '-' 
+readonly_username = os.getenv('READONLY_USERNAME', 'kooplex_reader')
+readonly_pw = os.getenv('READONLY_PASSWORD', 'reader-pw')
+readonly_fullname = os.getenv('READONLY_FULLNAME', 'Kooplex Reader')
+
 p = os.getenv('SCHEMA_PATH', '../schema')
 
 tables = [ 'cov', 'vcf_all', 'vcf', 'meta', 'lineage_def', 'ecdc_covid_country_weekly', 'operation', 'unique_cov', 'unique_vcf' ]
@@ -121,17 +126,17 @@ if __name__ == '__main__':
 
     # create user
     if args.create_user:
-        statement = create_user(os.getenv('READONLY_USERNAME', 'kooplex-reader'), os.getenv('READONLY_PASSWORD', 'reader-pw'), os.getenv('READONLY_FULLNAME', 'Kooplex Reader') )
+        statement = create_user(readonly_username, readonly_pw, readonly_fullname )
         db_exec( statement, transaction = False )
 
     # drop user
     if args.drop_user:
-        statement = "DROP USER " + os.getenv('READONLY_USERNAME', 'kooplex-reader')
+        statement = "DROP USER " + readonly_username
         db_exec( statement, transaction = False )
 
     # grant read only right to user
     if args.grant_access:
-        for statement in grant_read(os.getenv('READONLY_USERNAME', 'kooplex-reader'), db):
+        for statement in grant_read(readonly_username, db):
             db_exec( statement, transaction = True )
 
     # create tables
