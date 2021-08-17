@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monetdb-kooplex
+  namespace: kooplex-veo
+spec:
+  selector:
+    name: lbl-monetdb
+  ports:
+    - name: monetdb
+      protocol: TCP
+      port: 500000
+      targetPort: 500000
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monetdb-kooplex
+  namespace: kooplex-veo
+  labels:
+    name: lbl-monetdb
+spec:
+  containers:
+  - image: monetdb/monetdb
+    name: monetdb
+    ports:
+      - containerPort: 500000
+        name: monetdb
+    env:
+    - name: monetdb_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: monet-admin-ebi
+          key: adminpw
+    - name: monetdb_USER
+      valueFrom:
+        secretKeyRef:
+          name: monet-admin-ebi
+          key: admin
+    volumeMounts:
+      - mountPath: /var/lib/monetdbql/data
+        name: svcdata
+        subPath: data
+  volumes:
+    - name: svcdata
+      persistentVolumeClaim:
+        claimName: pvc-monetdb

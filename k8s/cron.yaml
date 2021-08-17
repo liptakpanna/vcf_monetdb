@@ -1,0 +1,126 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: populate-data
+  namespace: kooplex-veo
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - command:
+            - /mnt/repo/scripts/wrap.sh
+            env:
+            - name: SCHEMA_PATH
+              value: /mnt/repo/schema/
+            - name: SECRET_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: admin
+                  name: monet-admin-ebi
+            - name: SECRET_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: adminpw
+                  name: monet-admin-ebi
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: dbhost
+                  name: monet-admin-ebi
+            - name: DB
+              valueFrom:
+                secretKeyRef:
+                  key: db
+                  name: monet-admin-ebi
+            image: veo.vo.elte.hu:5000/k8plex:rshiny-python
+            imagePullPolicy: IfNotPresent
+            name: populate-data
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /mnt
+              name: pvc
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: pvc
+            persistentVolumeClaim:
+              claimName: pvc-raw
+  schedule: 0 9 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: populate-data-ecdc
+  namespace: kooplex-veo
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - command:
+            - /mnt/repo/scripts/wrap_ecdc.sh
+            env:
+            - name: SECRET_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: admin
+                  name: monet-admin-ebi
+            - name: SECRET_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: adminpw
+                  name: monet-admin-ebi
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: dbhost
+                  name: monet-admin-ebi
+            - name: DB
+              valueFrom:
+                secretKeyRef:
+                  key: db
+                  name: monet-admin-ebi
+            image: veo.vo.elte.hu:5000/k8plex:rshiny-python
+            imagePullPolicy: IfNotPresent
+            name: populate-data-ecdc
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /mnt/repo
+              name: pvc
+              subPath: repo
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: pvc
+            persistentVolumeClaim:
+              claimName: pvc-raw
+  schedule: 0 0 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false

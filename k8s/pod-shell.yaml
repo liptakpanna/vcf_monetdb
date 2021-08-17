@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monetdb-shell
+  namespace: kooplex-veo
+spec:
+  hostname: monetdb-shell
+  containers:
+  - image: veo.vo.elte.hu:5000/k8plex:rshiny-python
+    command:
+      - sleep
+      - infinity
+    name: monetdb-shell
+    env:
+      - name: SCHEMA_PATH
+        value: /mnt/repo/schema/
+      - name: DB_PORT
+        value: "5432"
+      - name: SECRET_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: monet-admin-ebi
+            key: admin
+      - name: SECRET_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: monet-admin-ebi
+            key: adminpw
+      - name: DB_HOST
+        valueFrom:
+          secretKeyRef:
+            name: monet-admin-ebi
+            key: dbhost
+      - name: DB
+        valueFrom:
+          secretKeyRef:
+            name: monet-admin-ebi
+            key: db
+    volumeMounts:
+      - mountPath: /mnt
+        name: pv-x
+  volumes:
+    - name: pv-x
+      persistentVolumeClaim:
+        claimName: pvc-raw
+
