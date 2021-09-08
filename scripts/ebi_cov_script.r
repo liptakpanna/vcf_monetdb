@@ -6,7 +6,9 @@ library(MonetDB.R)
 
 print(paste(Sys.time(), "started...", sep = " "))
 
-con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="test", user="monetdb", password="monetdb")
+con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
+
+dbSendUpdate(con, "set schema kooplex")
 
 # Downloads the ID of the already uploaded coverage files
 
@@ -33,29 +35,29 @@ if (nrow(ids) != 0) {
   ids <- ids %>%
     mutate(rows = seq.int(nrow(ids))) %>%
     mutate(bin = cut(rows, seq(1, nrow(ids) + 500, 500), right = FALSE)) # this creates bins because if too many files are treated in a single sptep, then it can cause problem, so in a single step data about max 500 samples are uploaded
-
+  
   for (j in levels(ids$bin)) {
     print(paste(Sys.time(), "processing bin", j, sep = " "))
     cov <- tibble(poz = 1:29903)
     x <- ids %>%
       filter(bin == j)
     x <- as.character(x$ena_run)
-
+    
     unique_cov <- tibble(insertion_ts = as.POSIXct(NA), ena_run = character(), snapshot = character(), integrity = integer())
     ts <- Sys.time() 
     r <- 0
-
+    
     for (i in x) {
-	    
+      
       r <- r+1
       unique_cov[r, 'insertion_ts'] <- ts
       unique_cov[r, 'ena_run'] <- i
       unique_cov[r, 'snapshot'] <- snapshot
-
+      
       if (file.size(paste(filepath, i, ".coverage", sep = "")) != 0) {
         temp <- read_csv(paste(filepath, i, ".coverage", sep = ""),
-          col_names = c("id", "ref", i),
-          cols(col_double(), col_character(), col_double())
+                         col_names = c("id", "ref", i),
+                         cols(col_double(), col_character(), col_double())
         )
         if (ncol(temp != 0) & nrow(temp) == 29903) {
           cov <- cbind(cov, temp[3])
@@ -66,7 +68,7 @@ if (nrow(ids) != 0) {
         }
       } else {
         print(paste(Sys.time(), "excluded empty file:", i, sep = " "))
-          unique_cov[r, 'integrity'] <- 1
+        unique_cov[r, 'integrity'] <- 1
       }
     }
     if (ncol(cov) != 1) {
@@ -75,15 +77,15 @@ if (nrow(ids) != 0) {
         dplyr::rename(pos = poz) %>%
         dplyr::filter(coverage<100)%>%
         select(ena_run, pos, coverage)
-
+      
       print(paste(Sys.time(), "appending", nrow(cov), " records in cov", sep = " "))
       dbWriteTable(con, "cov_append", cov, append = TRUE, row.names = FALSE)
       dbWriteTable(con, "unique_cov_append", unique_cov, append = TRUE, row.names = FALSE)
       N <- N + r
-
+      
       # Remove those tmp files that are successfully appended to table
       for (f in x) {
-       file.remove(paste(filepath, f, ".coverage", sep = ""))
+        file.remove(paste(filepath, f, ".coverage", sep = ""))
       }
       print(paste(Sys.time(), "files removed, loop next", sep = " "))
     }
@@ -92,4 +94,3 @@ if (nrow(ids) != 0) {
 
 
 print(paste(Sys.time(), "number of records appended to cov_append", N, sep = " "))
-

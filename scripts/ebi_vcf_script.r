@@ -28,9 +28,7 @@ print(paste(Sys.time(), "number of records in vcf_all table", nrow(n), sep = " "
 # Selects the new vcf files and uploads them in bins
 
 filepath <- c(Sys.getenv(c("DIR_TMP")))
-#filepath <- "/v/pannna/snapshot/"
 snapshot <- c(Sys.getenv(c("SNAPSHOT")))
-#snapshot <- "6"
 
 ids <- tibble(ena_run = str_remove_all(list.files(path = filepath, pattern = regex("[0-9].annot.vcf")), pattern = ".annot.vcf"))
 ids <- ids %>%
