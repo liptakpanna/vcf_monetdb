@@ -7,7 +7,7 @@ library(MonetDB.R)
 
 print(paste(Sys.time(), "started...", sep=" ")) 
 
-												
+
 
 url <- getURL(url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_run&query=tax_tree(2697049)&fields=accession%2Csample_accession%2Cexperiment_accession%2Cstudy_accession%2Cdescription%2Ccountry%2Ccollection_date%2Cfirst_created%2Cfirst_public%2Chost%2Chost_sex%2Chost_tax_id%2Chost_body_site%2Cbio_material%2Cculture_collection%2Cinstrument_model%2Cinstrument_platform%2Clibrary_layout%2Clibrary_name%2Clibrary_selection%2Clibrary_source%2Clibrary_strategy%2Csequencing_method%2Cisolate%2Cstrain%2Cbase_count%2Ccollected_by%2Cbroker_name%2Ccenter_name%2Csample_capture_status%2Cfastq_ftp%2Ccollection_date_submitted%2Cchecklist&format=tsv&limit=0", 
               httpheader =c( 'Content-Type' = "application/x-www-form-urlencoded")                )
@@ -16,7 +16,7 @@ d1 <- read_tsv(file = url , col_types = cols(.default = "c"))
 print(paste(Sys.time(), "number of rows downloaded:", nrow(d1), sep=" ")) 
 
 if (nrow(d1) < 1) {
- q(status = 2)
+  q(status = 2)
 }
 
 # There some run_accession id was not unique, this part below fix this
@@ -70,19 +70,18 @@ clean_meta$clean_collection_date <- as_date(clean_meta$clean_collection_date)
 
 print(paste(Sys.time(), "parsed", sep=" ")) 
 
-con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="test", user="monetdb", password="monetdb")
+con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
+dbSendUpdate(con, "set schema kooplex")
 
 dbSendQuery(con, "TRUNCATE TABLE meta_append")
 print(paste(Sys.time(), "truncated table meta_append", sep=" ")) 
 
 dbWriteTable(con, "meta_append", clean_meta , append = TRUE, row.names = FALSE)
 
-n <- tbl(con, "meta_append") %>% 
-  count()%>%
-  collect
+n <- dbGetQuery(con, "select count(*) from meta_append")
 
-print(paste(Sys.time(), "wrote", n$n, "records in table meta_append", sep=" ")) 
+print(paste(Sys.time(), "wrote", n, "records in table meta_append", sep=" ")) 
 
-if (n$n == 0) {
+if (n == 0) {
   q(status = 1)
 }
