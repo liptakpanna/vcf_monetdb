@@ -28,6 +28,7 @@ fin <- country_iso %>%
 print(paste(Sys.time(), "parsed", sep=" ")) 
 
 con<- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
+dbSendUpdate(con, "set schema kooplex")
 
 dbSendQuery(con, "TRUNCATE TABLE ecdc_covid_country_weekly")
 print(paste(Sys.time(), "truncated table ecdc_covid_country_weekly", sep=" ")) 

@@ -8,6 +8,7 @@ lineage_def <- read_delim(file = "/mnt/repo/data/table_variants_veo.csv", delim 
 
 
 con<- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
+dbSendUpdate(con, "set schema kooplex")
 
 lineage_def <- lineage_def %>%
   dplyr::rename(variant_id = "WHO_label")%>%
