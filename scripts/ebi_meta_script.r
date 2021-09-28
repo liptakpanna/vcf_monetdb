@@ -70,8 +70,16 @@ clean_meta$clean_collection_date <- as_date(clean_meta$clean_collection_date)
 
 print(paste(Sys.time(), "parsed", sep=" ")) 
 
-con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
-dbSendUpdate(con, "set schema kooplex")
+source("util.r")
+
+con <- dbConnect(MonetDB.R(), 
+  host=getEnvVar("DB_HOST","monetdb.monetdb"), 
+  dbname=getEnvVar("DB","demo"), 
+  port=getEnvVar("DB_PORT","50000"),
+  user=getEnvVar("SECRET_USERNAME","monetdb"), 
+  password=getEnvVar("SECRET_PASSWORD","monetdb"))
+
+dbSendUpdate(con, "set schema " + getEnvVar("SCHEMA","kooplex"))
 
 dbSendQuery(con, "TRUNCATE TABLE meta_append")
 print(paste(Sys.time(), "truncated table meta_append", sep=" ")) 

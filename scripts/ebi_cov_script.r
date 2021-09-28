@@ -6,9 +6,16 @@ library(MonetDB.R)
 
 print(paste(Sys.time(), "started...", sep = " "))
 
-con <- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
+source("util.r")
 
-dbSendUpdate(con, "set schema kooplex")
+con <- dbConnect(MonetDB.R(), 
+  host=getEnvVar("DB_HOST","monetdb.monetdb"), 
+  dbname=getEnvVar("DB","demo"), 
+  port=getEnvVar("DB_PORT","50000"),
+  user=getEnvVar("SECRET_USERNAME","monetdb"), 
+  password=getEnvVar("SECRET_PASSWORD","monetdb"))
+
+dbSendUpdate(con, "set schema " + getEnvVar("SCHEMA","kooplex"))
 
 # Downloads the ID of the already uploaded coverage files
 

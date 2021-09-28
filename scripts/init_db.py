@@ -121,8 +121,8 @@ if __name__ == '__main__':
     myConnection = con(db)
     print ("{0} connected to db {1}".format(datetime.datetime.now(), db))
 
-    db_exec("Create schema if not exists kooplex", transaction=False)
-    db_exec("set schema kooplex", transaction=False)
+    db_exec("Create schema if not exists " + schema, transaction=False)
+    db_exec("set schema " + schema, transaction=False)
 
     # create user
     if args.create_user:
