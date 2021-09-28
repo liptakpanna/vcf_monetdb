@@ -34,5 +34,5 @@ CREATE TABLE IF NOT EXISTS vcf_all (
     aa_pos__aa_length      text,
     distance         int,
     errors_warnings_info      text,
-    CONSTRAINT pk_vcf PRIMARY KEY (ena_run,pos,ref,alt)
+    CONSTRAINT pk_vcf_all PRIMARY KEY (ena_run,pos,ref,alt)
 );
