@@ -33,5 +33,6 @@ CREATE TABLE IF NOT EXISTS vcf_all (
     cds_pos__cds_length      text,
     aa_pos__aa_length      text,
     distance         int,
-    errors_warnings_info      text
+    errors_warnings_info      text,
+    CONSTRAINT pk_vcf PRIMARY KEY (ena_run,pos,ref,alt)
 );

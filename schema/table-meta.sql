@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS meta (
 	checklist text,
 	clean_collection_date date,
 	date_isoweek int,
-	date_isoyear int
+	date_isoyear int,
+	CONSTRAINT pk_meta PRIMARY KEY (ena_run)
 	
 );
