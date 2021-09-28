@@ -9,7 +9,7 @@ print(paste(Sys.time(), "started...", sep = " "))
 #FIXME:
 manual_excl_id <- c("ERR5471857", "ERR5473614", "ERR5473980", "ERR5474250",    "ERR5479235") # This vcf file is wrong, so needed to exclude manualy
 
-source("util.r")
+source("scripts/util.r")
 
 con <- dbConnect(MonetDB.R(), 
   host=getEnvVar("DB_HOST","monetdb.monetdb"), 
@@ -18,7 +18,7 @@ con <- dbConnect(MonetDB.R(),
   user=getEnvVar("SECRET_USERNAME","monetdb"), 
   password=getEnvVar("SECRET_PASSWORD","monetdb"))
 
-dbSendUpdate(con, "set schema " + getEnvVar("SCHEMA","kooplex"))
+dbSendUpdate(con, paste("set schema ", getEnvVar("SCHEMA","kooplex")))
 
 # Downloads the ID of the already uploaded vcf files
 

@@ -27,7 +27,7 @@ fin <- country_iso %>%
 
 print(paste(Sys.time(), "parsed", sep=" ")) 
 
-source("util.r")
+source("scripts/util.r")
 
 con <- dbConnect(MonetDB.R(), 
   host=getEnvVar("DB_HOST","monetdb.monetdb"), 
@@ -36,7 +36,7 @@ con <- dbConnect(MonetDB.R(),
   user=getEnvVar("SECRET_USERNAME","monetdb"), 
   password=getEnvVar("SECRET_PASSWORD","monetdb"))
 
-dbSendUpdate(con, "set schema " + getEnvVar("SCHEMA","kooplex"))
+dbSendUpdate(con, paste("set schema ", getEnvVar("SCHEMA","kooplex")))
 
 dbSendQuery(con, "TRUNCATE TABLE ecdc_covid_country_weekly")
 print(paste(Sys.time(), "truncated table ecdc_covid_country_weekly", sep=" ")) 

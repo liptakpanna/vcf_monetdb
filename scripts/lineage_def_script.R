@@ -6,9 +6,16 @@ print(paste(Sys.time(), "started...", sep = " "))
 
 lineage_def <- read_delim(file = "/mnt/repo/data/table_variants_veo.csv", delim = ";")
 
+source("scripts/util.r")
 
-con<- dbConnect(MonetDB.R(), host="monetdb.monetdb", dbname="demo", user="monetdb", password="monetdb")
-dbSendUpdate(con, "set schema kooplex")
+con <- dbConnect(MonetDB.R(), 
+  host=getEnvVar("DB_HOST","monetdb.monetdb"), 
+  dbname=getEnvVar("DB","demo"), 
+  port=getEnvVar("DB_PORT","50000"),
+  user=getEnvVar("SECRET_USERNAME","monetdb"), 
+  password=getEnvVar("SECRET_PASSWORD","monetdb"))
+
+dbSendUpdate(con, paste("set schema ", getEnvVar("SCHEMA","kooplex")))
 
 lineage_def <- lineage_def %>%
   dplyr::rename(variant_id = "WHO_label")%>%
